@@ -1,4 +1,4 @@
-# Real time video effects(Windows GPU Engine)
+# AirLens - Real time video effects Windows GPU Engine
 
 Real-time video shader engine for Windows. Features multi-threaded camera capture, asyncroness MediaPipe hand landmark tracking, and OpenGL fragment shaders with dynamic coordinate masking.
 
