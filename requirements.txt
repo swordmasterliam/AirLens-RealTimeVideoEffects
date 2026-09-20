@@ -1,0 +1,6 @@
+opencv-python>=4.8.0
+glfw>=2.6.0
+PyOpenGL>=3.1.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+pillow>=10.0.0

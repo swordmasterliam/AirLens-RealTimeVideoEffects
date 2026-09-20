@@ -1,0 +1,54 @@
+#version 330 core
+
+/*
+ * Custom Shader Template
+ * =======================
+ * To create your own shader:
+ * 1. Copy this file and rename it to `11_my_effect.frag` (or any name ending with `.frag`).
+ * 2. Edit the code below using any text editor (Notepad, VS Code, etc.).
+ * 3. Press 'R' in the running application (or it will hot-reload automatically on save).
+ *
+ * Built-in Uniforms provided to your shader:
+ * - uniform sampler2D u_camera;       // Webcam video stream texture
+ * - uniform vec2      u_resolution;   // Screen resolution in pixels (e.g. 1280, 720)
+ * - uniform float     u_time;         // Time in seconds since application start
+ * - uniform vec4      u_hand_box;     // Hand bounding box (min_x, min_y, max_x, max_y) in [0, 1]
+ * - uniform float     u_has_box;      // 1.0 if hands are detected, 0.0 otherwise
+ * - uniform int       u_mask_mode;    // 0: Inside Box, 1: Outside Box (Inverted), 2: Full Screen
+ * - uniform float     u_intensity;    // Effect strength slider (tunable via Up/Down keys)
+ * - uniform vec2      u_thumb1;       // Hand 1 thumb tip coordinate [0, 1]
+ * - uniform vec2      u_index1;       // Hand 1 index finger tip coordinate [0, 1]
+ * - uniform vec2      u_thumb2;       // Hand 2 thumb tip coordinate [0, 1]
+ * - uniform vec2      u_index2;       // Hand 2 index finger tip coordinate [0, 1]
+ * - uniform vec2      u_mouse;        // Mouse position in [0, 1]
+ */
+
+out vec4 FragColor;
+in vec2 v_uv;
+
+uniform sampler2D u_camera;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec4 u_hand_box;
+uniform float u_has_box;
+uniform int u_mask_mode;
+uniform float u_intensity;
+
+#include "common.glsl"
+
+void main() {
+    vec4 base_color = texture(u_camera, v_uv);
+    float mask = compute_mask(v_uv, u_hand_box, u_has_box, u_mask_mode, 0.02);
+
+    if (mask <= 0.001) {
+        FragColor = base_color;
+        return;
+    }
+
+    // Invert colors and apply color wave
+    vec3 effect_color = vec3(1.0) - base_color.rgb;
+    effect_color.r *= 0.5 + 0.5 * sin(u_time * 3.0 + v_uv.x * 10.0);
+    effect_color.g *= 0.5 + 0.5 * cos(u_time * 2.0 + v_uv.y * 10.0);
+
+    FragColor = mix(base_color, vec4(effect_color, 1.0), mask * clamp(u_intensity, 0.0, 2.0));
+}
